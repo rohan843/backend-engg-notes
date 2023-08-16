@@ -9,6 +9,7 @@
       - [Anatomy of Request/Response](#anatomy-of-requestresponse)
       - [Usecase: Building an Upload Image Service with Request Response](#usecase-building-an-upload-image-service-with-request-response)
       - [This Model Doesn't Work Everywhere!](#this-model-doesnt-work-everywhere)
+      - [Summary](#summary)
 
 ## (Some) Backend Communication Design Patterns
 
@@ -28,9 +29,9 @@ The basic outline is:
 sequenceDiagram
     participant Client
     participant Server
-    Client->>+Server: Sends a request
+    Client->>Server: Sends a request
     Note right of Server: Server parses and <br />processes the request.
-    Server->>+Client: Sends a response
+    Server->>Client: Sends a response
     Note left of Client: Client parses and <br />consumes the response.
 ```
 
@@ -67,8 +68,8 @@ We have various ways of creating a service that can allow clients to upload imag
 sequenceDiagram
     participant Client
     participant Server
-    Client->>+Server: Request containing the image.
-    Server->>+Client: Response (ACK)
+    Client->>Server: Request containing the image.
+    Server->>Client: Response (ACK)
 ```
 
 2. Client divides the image into different chunks, and then sends each chunk in a different request. This allows for resumable sending of image (i.e., server can request specific chunks instead of the whole image in case the connection failed).
@@ -77,12 +78,12 @@ sequenceDiagram
 sequenceDiagram
     participant Client
     participant Server
-    Client->>+Server: Request containing chunk 1
-    Server->>+Client: Response (ACK)
-    Client->>+Server: Request containing chunk 3
-    Server->>+Client: Response (ACK)
-    Client->>+Server: Request containing chunk 2
-    Server->>+Client: Response (ACK)
+    Client->>Server: Request containing chunk 1
+    Server->>Client: Response (ACK)
+    Client->>Server: Request containing chunk 3
+    Server->>Client: Response (ACK)
+    Client->>Server: Request containing chunk 2
+    Server->>Client: Response (ACK)
     Note right of Server: The server can re-create <br> the whole image now.
 ```
 
@@ -100,3 +101,27 @@ In both of these, the server cannot send a 'response' unless the client requests
 Such requests can be handled via this model, but the client will have to wait for a long time before the response arrives here. An asynchronous model might be better suited for this case.
 Also, if the client disconnects while the request is running, upon reconnection the client might want to know the status of the request.
 
+#### Summary
+
+The basic method of operation is the following:
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Server
+    Note over Client, Server: The client sends a request <br/>to the server.
+    Note over Client: t0
+    Client->>Server: Request
+    Note over Server: t1
+    Note over Client, Server: Server processes the request
+    Note over Server: t50
+    Server->>Client: Response
+    Note over Client: t51
+    Note over Client, Server: Server sends the response back <br/>to the client.
+```
+
+At time `t0`, the client has _finished_ serializing the request and flushing it to the network. At time `t1`, the server parses the request.
+
+Now, uptill time `t50` the server processes the request, generates the response, serializes it _and_ flushes it to the network.
+
+The client receives the response at time `t51`.
