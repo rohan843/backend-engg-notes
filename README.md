@@ -114,10 +114,10 @@ sequenceDiagram
     Client->>Server: Request
     Note over Server: t1
     Note over Client, Server: Server processes the request
+    Note over Client, Server: Server sends the response back <br/>to the client.
     Note over Server: t50
     Server->>Client: Response
     Note over Client: t51
-    Note over Client, Server: Server sends the response back <br/>to the client.
 ```
 
 At time `t0`, the client has _finished_ serializing the request and flushing it to the network. At time `t1`, the server parses the request.
