@@ -10,6 +10,7 @@
       - [Usecase: Building an Upload Image Service with Request Response](#usecase-building-an-upload-image-service-with-request-response)
       - [This Model Doesn't Work Everywhere!](#this-model-doesnt-work-everywhere)
       - [Summary](#summary)
+    - [Synchronous vs Asynchronous Workloads](#synchronous-vs-asynchronous-workloads)
 
 ## (Some) Backend Communication Design Patterns
 
@@ -125,3 +126,5 @@ At time `t0`, the client has _finished_ serializing the request and flushing it 
 Now, uptill time `t50` the server processes the request, generates the response, serializes it _and_ flushes it to the network.
 
 The client receives the response at time `t51`.
+
+### Synchronous vs Asynchronous Workloads
