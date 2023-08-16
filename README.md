@@ -120,7 +120,7 @@ sequenceDiagram
     Note over Client: t51
 ```
 
-At time `t0`, the client has _finished_ serializing the request and flushing it to the network. At time `t1`, the server parses the request.
+At time `t0`, the client has _finished_ serializing the request and flushing it to the network. At time `t1`, the server starts parsing the request.
 
 Now, uptill time `t50` the server processes the request, generates the response, serializes it _and_ flushes it to the network.
 
