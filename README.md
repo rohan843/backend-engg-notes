@@ -8,6 +8,7 @@
     - [Request Response Model](#request-response-model)
       - [Anatomy of Request/Response](#anatomy-of-requestresponse)
       - [Usecase: Building an Upload Image Service with Request Response](#usecase-building-an-upload-image-service-with-request-response)
+      - [This Model Doesn't Work Everywhere!](#this-model-doesnt-work-everywhere)
 
 ## (Some) Backend Communication Design Patterns
 
@@ -70,4 +71,32 @@ sequenceDiagram
     Server->>+Client: Response (ACK)
 ```
 
-2. 
+2. Client divides the image into different chunks, and then sends each chunk in a different request. This allows for resumable sending of image (i.e., server can request specific chunks instead of the whole image in case the connection failed).
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Server
+    Client->>+Server: Request containing chunk 1
+    Server->>+Client: Response (ACK)
+    Client->>+Server: Request containing chunk 3
+    Server->>+Client: Response (ACK)
+    Client->>+Server: Request containing chunk 2
+    Server->>+Client: Response (ACK)
+    Note right of Server: The server can re-create <br> the whole image now.
+```
+
+#### This Model Doesn't Work Everywhere!
+
+Although the request response model is a popularly used model, some cases exist where use of this model would not produce optimal results.
+
+1. Notification service (e.g., is there any new sale?)
+2. Chatting application (e.g., are there new messages?)
+
+In both of these, the server cannot send a 'response' unless the client requests the server for it. A way of building a chatting application using this model might require the client to poll a server repeatedly to check if there are any new messages. This will place a lot of unnecessary (empty) requests on the network. Therefore, this method doesn't scale well.
+
+3. Very long running requests (e.g., query a billion rows in a DB)
+
+Such requests can be handled via this model, but the client will have to wait for a long time before the response arrives here. An asynchronous model might be better suited for this case.
+Also, if the client disconnects while the request is running, upon reconnection the client might want to know the status of the request.
+
