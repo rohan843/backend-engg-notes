@@ -7,6 +7,7 @@
   - [(Some) Backend Communication Design Patterns](#some-backend-communication-design-patterns)
     - [Request Response Model](#request-response-model)
       - [Anatomy of Request/Response](#anatomy-of-requestresponse)
+      - [Usecase: Building an Upload Image Service with Request Response](#usecase-building-an-upload-image-service-with-request-response)
 
 ## (Some) Backend Communication Design Patterns
 
@@ -55,3 +56,18 @@ This will be determined when the client and the server decide upon a protocol to
 
 Same applies to the response.
 
+#### Usecase: Building an Upload Image Service with Request Response
+
+We have various ways of creating a service that can allow clients to upload images:
+
+1. Client sends a large request with the image. This is simple, but in case the connection fails in between, all previous sent data will be lost.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Server
+    Client->>+Server: Request containing the image.
+    Server->>+Client: Response (ACK)
+```
+
+2. 
