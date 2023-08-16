@@ -22,6 +22,10 @@ The basic outline is:
 
 ```mermaid
 sequenceDiagram
+    participant Client
+    participant Server
     Client->>+Server: Sends a request
+    Note right of Server: Server parses and <br />processes the request.
     Server->>+Client: Sends a response
+    Note left of Client: Client parses and <br />consumes the response.
 ```
