@@ -11,6 +11,8 @@
       - [This Model Doesn't Work Everywhere!](#this-model-doesnt-work-everywhere)
       - [Summary](#summary)
     - [Synchronous vs Asynchronous Workloads](#synchronous-vs-asynchronous-workloads)
+      - [Synchronous I/O](#synchronous-io)
+      - [Asynchronous I/O](#asynchronous-io)
 
 ## (Some) Backend Communication Design Patterns
 
@@ -128,3 +130,20 @@ Now, uptill time `t50` the server processes the request, generates the response,
 The client receives the response at time `t51`.
 
 ### Synchronous vs Asynchronous Workloads
+
+The basic idea is that whether extra useful work can be done while our system waits for some processing to be done.
+
+#### Synchronous I/O
+
+The caller sends a request and blocks.
+
+The calling process's context is switched out of the CPU while the I/O operation takes place. The caller cannot execute any code meanwhile.
+
+Once the receiver responds, the caller unblocks and execution can continue.
+
+Effectively, the caller and the receiver are in sync.
+
+As an example, consider that a program asks OS to read from the disk. The main thread of the program will be taken off the CPU while the disk is read. Once the read completes, the program can continue execution.
+
+#### Asynchronous I/O
+
