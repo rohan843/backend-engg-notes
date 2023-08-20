@@ -14,6 +14,7 @@
       - [Synchronous I/O](#synchronous-io)
       - [Asynchronous I/O](#asynchronous-io)
       - [Synchronous vs Asynchronous in Request Response](#synchronous-vs-asynchronous-in-request-response)
+      - [Real Life Examples](#real-life-examples)
 
 ## (Some) Backend Communication Design Patterns
 
@@ -169,4 +170,22 @@ Synchronicity is mainly a client side property.
 Most modern client libraries (fetch, axios, etc.) are asynchronous.
 
 A client may send an HTTP request and still continue to do work.
+
+#### Real Life Examples
+
+In synchronous communicaion, the caller waits for a response from the receiver. This is like asking something to someone in a meeting, face to face.
+
+In contrast, in asynchronous communication, the response can come any time, and the receiver can do anything in the meantime. This is like emails.
+
+We commonly use asynchronous programming in our apps. This involves the use of promises or futures and so on.
+
+We can also have asynchronous backend processing. Say the client submits a request for a very long running request to the backend. From the client's perspective, it can go further asynchronously, while some secondary thread may wait for the backend to reply. However, from the backend's view, there is a pending request. The backend might, in such a scenario introduce queues into the picture. A long running request can be placed into an execution queue, and the client can be sent back an identifier, like a job id.
+The client can save this job id, and can later ask the backend if that job has finished execution.
+
+There is a concept of asynchronous commits in postgres. When a client commits, usually it is a synchronous commit, where the client is blocked while the WAL contents in the memory buffer are written to the disk. Once that is done, the client is unblocked and also a successful commit is displayed. However, in asynchronous commits, the moment the WAL memory buffer begins the flush to disk (i.e., not flushed yet; we just started the process), the client is displayed a successful commit message. _This is a dangerous way of commits, as if the system crashed but the WAL was not fully flushed, we would lose our data, even though the transaction seemed committed to us._
+
+As before, we have asynchronous IO in linux, via `epoll` and `io_uring`.
+
+We even have asynchronous replication. When we perform replication, our main goal is to have 1 DB server to allow for writes, and multiple ones to allow for reads. Say a client did some updates at the primary (writer) DB server. Now, when the client commits its transaction, it will issue a commit command. The writer may now issue the commit first to each replica, and only on getting the commit reply from each, would it reply to the client that the commit has taken place. This takes time and the client would be blocked for a long time.
+In contrast, we may have configured that transaction (or _every_ transaction, by default) to perform commits via async replication. This way, when the client commits, only the primary DB replica commits (note that this commit may also be asyncronous, as described above) and replies to the client that the commit has occurred. The comitted changes can then spread throughout the other replicas gradually. (This comes at a cost of eventual consistency).
 
