@@ -13,6 +13,7 @@
     - [Synchronous vs Asynchronous Workloads](#synchronous-vs-asynchronous-workloads)
       - [Synchronous I/O](#synchronous-io)
       - [Asynchronous I/O](#asynchronous-io)
+      - [Synchronous vs Asynchronous in Request Response](#synchronous-vs-asynchronous-in-request-response)
 
 ## (Some) Backend Communication Design Patterns
 
@@ -146,4 +147,26 @@ Effectively, the caller and the receiver are in sync.
 As an example, consider that a program asks OS to read from the disk. The main thread of the program will be taken off the CPU while the disk is read. Once the read completes, the program can continue execution.
 
 #### Asynchronous I/O
+
+The caller sends a request.
+
+The caller can continue to work until it gets a response.
+
+The caller may follow one of the following:
+
+1. Caller can check if the response is ready via `epoll`.
+2. The receiver may call back when it is done via `io_uring`.
+3. The caller can spin up a new thread, that blocks while the operation is going on.
+
+The caller and the receiver are not necessarily in sync.
+
+As an example, consider a program wants to read from a file. It creates a secondary thread. The secondary thread reads from disk. The OS blocks the secondary thread. The main thread is still running and executing code. Finally, the secondary thread finishes running, and calls back the main thread.
+
+#### Synchronous vs Asynchronous in Request Response
+
+Synchronicity is mainly a client side property.
+
+Most modern client libraries (fetch, axios, etc.) are asynchronous.
+
+A client may send an HTTP request and still continue to do work.
 
