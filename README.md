@@ -159,6 +159,8 @@ The caller may follow one of the following:
 2. The receiver may call back when it is done via `io_uring`.
 3. The caller can spin up a new thread, that blocks while the operation is going on.
 
+> The core principle for new thread based async code execution is that once a task being done asynchronously is finished, call some callback function with the results.
+
 The caller and the receiver are not necessarily in sync.
 
 As an example, consider a program wants to read from a file. It creates a secondary thread. The secondary thread reads from disk. The OS blocks the secondary thread. The main thread is still running and executing code. Finally, the secondary thread finishes running, and calls back the main thread.
@@ -189,3 +191,4 @@ As before, we have asynchronous IO in linux, via `epoll` and `io_uring`.
 We even have asynchronous replication. When we perform replication, our main goal is to have 1 DB server to allow for writes, and multiple ones to allow for reads. Say a client did some updates at the primary (writer) DB server. Now, when the client commits its transaction, it will issue a commit command. The writer may now issue the commit first to each replica, and only on getting the commit reply from each, would it reply to the client that the commit has taken place. This takes time and the client would be blocked for a long time.
 In contrast, we may have configured that transaction (or _every_ transaction, by default) to perform commits via async replication. This way, when the client commits, only the primary DB replica commits (note that this commit may also be asyncronous, as described above) and replies to the client that the commit has occurred. The comitted changes can then spread throughout the other replicas gradually. (This comes at a cost of eventual consistency).
 
+We also have async OS cache, i.e., any disk writes are written to an OS cache, before going to the disk. This is disabled in databases, and writes go directly to the DBs via `fsync`.
