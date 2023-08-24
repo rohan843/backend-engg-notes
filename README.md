@@ -15,6 +15,7 @@
       - [Asynchronous I/O](#asynchronous-io)
       - [Synchronous vs Asynchronous in Request Response](#synchronous-vs-asynchronous-in-request-response)
       - [Real Life Examples](#real-life-examples)
+    - [Push](#push)
 
 ## (Some) Backend Communication Design Patterns
 
@@ -191,4 +192,21 @@ As before, we have asynchronous IO in linux, via `epoll` and `io_uring`.
 We even have asynchronous replication. When we perform replication, our main goal is to have 1 DB server to allow for writes, and multiple ones to allow for reads. Say a client did some updates at the primary (writer) DB server. Now, when the client commits its transaction, it will issue a commit command. The writer may now issue the commit first to each replica, and only on getting the commit reply from each, would it reply to the client that the commit has taken place. This takes time and the client would be blocked for a long time.
 In contrast, we may have configured that transaction (or _every_ transaction, by default) to perform commits via async replication. This way, when the client commits, only the primary DB replica commits (note that this commit may also be asyncronous, as described above) and replies to the client that the commit has occurred. The comitted changes can then spread throughout the other replicas gradually. (This comes at a cost of eventual consistency).
 
-We also have async OS cache, i.e., any disk writes are written to an OS cache, before going to the disk. This is disabled in databases, and writes go directly to the DBs via `fsync`.
+We also have async OS cache, i.e., any disk writes are written to an OS cache, before going to the disk. This is disabled in databases, and writes go directly to the disk via `fsync`.
+
+### Push
+
+This is implemented when the response is needed as fast as possible.
+
+One possible use case is a chatting app. The client needs to connect to the chat server, but then all messages are sent by the server without any client request.
+
+The basic flow is:
+
+1. Client connects to a server. (_note that here, the client is opening a connection, not sending any request._)
+2. Server sends data to the client.
+3. No request is needed from the client side.
+4. This protocol typically must be bi-directional.
+
+This is used by RabbitMQ.
+
+
