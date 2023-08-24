@@ -20,6 +20,7 @@
     - [Short Polling](#short-polling)
       - [Advantages and Disadvantages](#advantages-and-disadvantages-1)
     - [Long Polling](#long-polling)
+      - [Advantages and Disadvantages](#advantages-and-disadvantages-2)
 
 ## (Some) Backend Communication Design Patterns
 
@@ -281,5 +282,13 @@ sequenceDiagram
     note over Server: .<br/>.<br/>.<br/>.<br/>.<br/>Some time passes<br/>.<br/>.<br/>.<br/>.<br/>.
     Server ->> Client: Response
 ```
+
+The major difference from usual request response is that the client can disconnect after the initial request.
+
+#### Advantages and Disadvantages
+
+The advantages are that it is less chatty and backend friendly. Also, clients can still disconnect after the first request.
+
+The disadvantage is that this is _not real time_. Say we build a message queue using this method. If a client subscribes to a topic, the client will only get a response when it polls. In this time difference, more messages may have come, removing the real-timedness of those messages.
 
 
