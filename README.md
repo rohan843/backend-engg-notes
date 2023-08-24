@@ -17,6 +17,7 @@
       - [Real Life Examples](#real-life-examples)
     - [Push](#push)
       - [Advantages and Disadvantages](#advantages-and-disadvantages)
+    - [Short Polling](#short-polling)
 
 ## (Some) Backend Communication Design Patterns
 
@@ -221,4 +222,29 @@ There are a few disadvantages as well:
 3. Requires a bi-directional protocol.
 4. Polling is preferred for lighter clients.
 
+### Short Polling
 
+> When someone says 'polling', they usually mean short polling.
+
+This is popular with the asynchronous style of programming.
+
+The basic flow is:
+
+1. Client sends a request.
+2. Server immediately responds with a handle (unique ID).
+3. Server may continue to process the request, or perhaps pick it up later, after persisting it in disk.
+4. Client uses the handle to check for the status of the request.
+   1. This is done by multiple 'short' request-response pairs as the polls.
+
+```mermaid
+sequenceDiagram
+    Client ->> Server: Request
+    Server ->> Client: RequestID `X`
+    Client ->> Server: Is `X` ready?
+    Server ->> Client: No
+    Client ->> Server: Is `X` ready?
+    Server ->> Client: No
+    note over Server: Some time later... (`X` is ready now).
+    Client ->> Server: Is `X` ready?
+    Server ->> Client: Response
+```
