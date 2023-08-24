@@ -18,6 +18,7 @@
     - [Push](#push)
       - [Advantages and Disadvantages](#advantages-and-disadvantages)
     - [Short Polling](#short-polling)
+      - [Advantages and Disadvantages](#advantages-and-disadvantages-1)
 
 ## (Some) Backend Communication Design Patterns
 
@@ -248,3 +249,11 @@ sequenceDiagram
     Client ->> Server: Is `X` ready?
     Server ->> Client: Response
 ```
+
+#### Advantages and Disadvantages
+
+The main advantages are that this is a simple model. It is good for long running requests, to facilitate asynchronous execution. It may also be built to allow for a client to disconnect, so that the server may persist the response for the client's handle, and send it sometime later when the client re-connects and asks for it.
+
+The disadvantages are that this is _too chatty_, especially as we scale and add more clients. There are lots of requests and responses going around on the network, and most of them would be a `not yet complete` type of response. Another issue is that high amount of network bandwidth is used up server side. On a cloud deployment, this means costlier bills. This also wastes backend resources.
+
+
