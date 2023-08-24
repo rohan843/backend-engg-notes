@@ -19,6 +19,7 @@
       - [Advantages and Disadvantages](#advantages-and-disadvantages)
     - [Short Polling](#short-polling)
       - [Advantages and Disadvantages](#advantages-and-disadvantages-1)
+    - [Long Polling](#long-polling)
 
 ## (Some) Backend Communication Design Patterns
 
@@ -255,5 +256,30 @@ sequenceDiagram
 The main advantages are that this is a simple model. It is good for long running requests, to facilitate asynchronous execution. It may also be built to allow for a client to disconnect, so that the server may persist the response for the client's handle, and send it sometime later when the client re-connects and asks for it.
 
 The disadvantages are that this is _too chatty_, especially as we scale and add more clients. There are lots of requests and responses going around on the network, and most of them would be a `not yet complete` type of response. Another issue is that high amount of network bandwidth is used up server side. On a cloud deployment, this means costlier bills. This also wastes backend resources.
+
+### Long Polling
+
+> This is used by Apache Kafka
+
+The basic idea is:
+
+1. Client sends a request.
+2. Server responds immediately with a handle.
+3. Server continues to process the request.
+4. Client uses the handle to check for the status.
+5. Server _does not_ respond until it has the response.
+
+The crux is that we have a handle, and we can disconnect until later (when we do ask for the status). This decreases the number of requests on the network.
+
+Some variations have timeouts as well.
+
+```mermaid
+sequenceDiagram
+    Client ->> Server: Request
+    Server ->> Client: RequestID `X`
+    Client ->> Server: Is `X` ready?
+    note over Server: .<br/>.<br/>.<br/>.<br/>.<br/>Some time passes<br/>.<br/>.<br/>.<br/>.<br/>.
+    Server ->> Client: Response
+```
 
 
