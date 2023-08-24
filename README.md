@@ -268,7 +268,7 @@ The basic idea is:
 2. Server responds immediately with a handle.
 3. Server continues to process the request.
 4. Client uses the handle to check for the status.
-5. Server _does not_ respond until it has the response.
+5. Server _does not_ respond until it has the response. (The short polling is kind of done locally at the server now; The client blocks until a response.)
 
 The crux is that we have a handle, and we can disconnect until later (when we do ask for the status). This decreases the number of requests on the network.
 
