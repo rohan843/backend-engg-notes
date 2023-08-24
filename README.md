@@ -261,7 +261,7 @@ The disadvantages are that this is _too chatty_, especially as we scale and add 
 
 ### Long Polling
 
-> This is used by Apache Kafka
+> This is used by Apache Kafka.
 
 The basic idea is:
 
