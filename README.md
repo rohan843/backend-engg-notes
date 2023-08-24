@@ -16,6 +16,7 @@
       - [Synchronous vs Asynchronous in Request Response](#synchronous-vs-asynchronous-in-request-response)
       - [Real Life Examples](#real-life-examples)
     - [Push](#push)
+      - [Advantages and Disadvantages](#advantages-and-disadvantages)
 
 ## (Some) Backend Communication Design Patterns
 
@@ -208,5 +209,16 @@ The basic flow is:
 4. This protocol typically must be bi-directional.
 
 This is used by RabbitMQ.
+
+#### Advantages and Disadvantages
+
+A major advantage is that this is real time. The moment something happens, a message can be sent.
+
+There are a few disadvantages as well:
+
+1. Clients must be online for this to work.
+2. Clients might not be able to handle huge amounts of data being pushed.
+3. Requires a bi-directional protocol.
+4. Polling is preferred for lighter clients.
 
 
